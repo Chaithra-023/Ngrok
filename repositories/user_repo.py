@@ -14,8 +14,8 @@ class UserRepo:
     def get_all_users(self):
         return self.db.query(User).all()
 
-    def create_user(self, email: str, hashed_password: str):
-        db_user = User(email=email, password=hashed_password)
+    def create_user(self, name: str, email: str, hashed_password: str):
+        db_user = User(name=name, email=email, password=hashed_password)
         self.db.add(db_user)
         self.db.commit()
         self.db.refresh(db_user)

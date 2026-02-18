@@ -3,7 +3,7 @@ from fastapi import APIRouter, HTTPException, Depends, status
 from sqlalchemy.orm import Session
 from db import get_db
 from repositories.user_repo import UserRepo
-from schemas.User_schema import UserSchema, UserResponse # Assuming UserResponse excludes password
+from schemas.User_schema import UserCreate, UserResponse # Assuming UserResponse excludes password
 from utils.security import get_password_hash
 
 # You can keep these in the same router or a new one
@@ -11,7 +11,7 @@ router = APIRouter(prefix="/users", tags=["Users"])
 
 ### 1. Create User (Admin/Manual Creation)
 @router.post("/", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
-def create_user(user: UserSchema, db: Session = Depends(get_db)):
+def create_user(user: UserCreate, db: Session = Depends(get_db)):
     user_repo = UserRepo(db)
     
     # Check if user already exists
@@ -20,7 +20,7 @@ def create_user(user: UserSchema, db: Session = Depends(get_db)):
     
     # Hash password and save
     hashed_pwd = get_password_hash(user.password)
-    new_user = user_repo.create_user(email=user.email, hashed_password=hashed_pwd)
+    new_user = user_repo.create_user(name=user.name, email=user.email, hashed_password=hashed_pwd)
     return new_user
 
 ### 2. Get All Users

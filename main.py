@@ -1,34 +1,17 @@
-from fastapi import FastAPI, Depends
-from sqlalchemy.orm import Session
-from pydantic import BaseModel
-from db import get_db
+from fastapi import FastAPI
+import model
+from db import engine
+from routes import user_routes
 
+model.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
-
-# --- Schemas ---
-class UserCreate(BaseModel):
-    name: str
-    email: str
-
+app.include_router(user_routes.router)
 
 @app.get("/")
 def read_root():
     return {"Hello": "World"}
-
-
-@app.get("/users")
-def get_users(db: Session = Depends(get_db)):
-    return {"users": []}
-
-@app.post("/users")
-def create_user(user: UserCreate, db: Session = Depends(get_db)):
-    return {"user": {"name": user.name, "email": user.email}}
-
-@app.get("/users/{user_id}")
-def get_user(user_id: int, db: Session = Depends(get_db)):
-    return {"user": {"id": user_id}}
 
 if __name__ == "__main__":
     import uvicorn
